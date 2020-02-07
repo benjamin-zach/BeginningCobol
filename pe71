@@ -4,7 +4,7 @@ PROGRAM-ID. GadgetStore.
 ENVIRONMENT DIVISION.
 INPUT-OUTPUT SECTION.
 FILE-CONTROL.
-	SELECT GadgetStoreData ASSIGN TO "pe71.dat" 
+	SELECT GadgetStoreData ASSIGN TO "GadgetStock.dat"
 		ORGANIZATION IS LINE SEQUENTIAL.
 
 DATA DIVISION.
@@ -17,8 +17,19 @@ FD GadgetStoreData.
 	02 QtyInStock	PIC 9(4).
 	02 Price	PIC 9(4)V99.
 
-01 ValueInStock PIC 9(8)V99 VALUE ZERO.
-01 TotalValue PIC 9(8)V99 VALUE ZERO.
+WORKING-STORAGE SECTION.
+01 ValueInStock PIC 9(6)V99 VALUE ZERO.
+01 TotalValue PIC 9(6)V99 VALUE ZERO.
+
+01 PrnStockValue.
+	02 PrnGadgetName	PIC X(30).
+	02 Filler		PIC XX VALUE SPACES.
+	02 PrnValue		PIC $$$,$$9.99.
+
+01 PrnFinalStockTotal.
+	02 FILLER		PIC X(16) VALUE SPACES.
+	02 FILLER		PIC X(16) VALUE "Stock Total:".
+	02 PrnFinalTotal	PIC $$$,$$9.99.
 
 PROCEDURE DIVISION.
 Begin.
@@ -26,15 +37,18 @@ Begin.
 	READ GadgetStoreData
 		AT END SET EndOfGadgetStoreData TO TRUE
 	END-READ
-	PERFORM UNTIL EndOfGadgetStoreData
-		MULTIPLY QtyInStock BY Price GIVING ValueInStock
-		DISPLAY GadgetRecord
-		DISPLAY GadgetName SPACE ValueInStock
-		ADD ValueInStock TO TotalValue
-		READ GadgetStoreData
-			AT END SET EndOfGadgetStoreData TO TRUE
-		END-READ
-	END-PERFORM
+	PERFORM DisplayGadgetValues UNTIL EndOfGadgetStoreData 
+	MOVE TotalValue TO PrnFinalTotal
+	DISPLAY PrnFinalStockTotal
 	CLOSE GadgetStoreData
-	DISPLAY "Total value: " TotalValue
 	STOP RUN.
+
+DisplayGadgetValues.
+	COMPUTE ValueInStock = Price * QtyInStock
+	ADD ValueInStock TO TotalValue
+	MOVE GadgetName TO PrnGadgetName
+	MOVE ValueInStock TO PrnValue
+	DISPLAY PrnStockValue
+	READ GadgetStoreData
+		AT END SET EndOfGadgetStoreData TO TRUE
+	END-READ.
