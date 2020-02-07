@@ -1,0 +1,40 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. GadgetStore.
+
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+	SELECT GadgetStoreData ASSIGN TO "pe71.dat" 
+		ORGANIZATION IS LINE SEQUENTIAL.
+
+DATA DIVISION.
+FILE SECTION.
+FD GadgetStoreData.
+01 GadgetRecord.
+	88 EndOfGadgetStoreData VALUE HIGH-VALUES.
+	02 GadgetId	PIC 9(6).
+	02 GadgetName	PIC X(30).
+	02 QtyInStock	PIC 9(4).
+	02 Price	PIC 9(4)V99.
+
+01 ValueInStock PIC 9(8)V99 VALUE ZERO.
+01 TotalValue PIC 9(8)V99 VALUE ZERO.
+
+PROCEDURE DIVISION.
+Begin.
+	OPEN INPUT GadgetStoreData
+	READ GadgetStoreData
+		AT END SET EndOfGadgetStoreData TO TRUE
+	END-READ
+	PERFORM UNTIL EndOfGadgetStoreData
+		MULTIPLY QtyInStock BY Price GIVING ValueInStock
+		DISPLAY GadgetRecord
+		DISPLAY GadgetName SPACE ValueInStock
+		ADD ValueInStock TO TotalValue
+		READ GadgetStoreData
+			AT END SET EndOfGadgetStoreData TO TRUE
+		END-READ
+	END-PERFORM
+	CLOSE GadgetStoreData
+	DISPLAY "Total value: " TotalValue
+	STOP RUN.

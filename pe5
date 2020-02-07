@@ -1,0 +1,37 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. Calculator.
+
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 Num1		PIC 9		VALUE 5.
+01 Num2		PIC 9 		VALUE 4.
+01 Result	PIC 99V9	VALUE ZEROS.
+01 Operator	PIC X		VALUE ZEROS.
+	88 AsteriskOp		VALUE "*".
+	88 SlashOp		VALUE "/".
+	88 PlusOp		VALUE "+".
+	88 MinusOp		VALUE "-".
+	88 EndChar		VALUE "s".
+
+PROCEDURE DIVISION.
+CalculateResult.
+	PERFORM UNTIL 1 > 2
+		DISPLAY "Enter operator (*, /, +, -): " WITH NO ADVANCING
+		ACCEPT Operator
+		DISPLAY "Enter first number: " WITH NO ADVANCING
+		ACCEPT Num1
+		DISPLAY "Enter second number: " WITH NO ADVANCING
+		ACCEPT Num2
+		EVALUATE TRUE
+			WHEN AsteriskOp 	MULTIPLY Num1 BY Num2 GIVING Result
+			WHEN SlashOp 		DIVIDE Num1 BY Num2 GIVING Result
+			WHEN PlusOp		ADD Num1 TO Num2 GIVING Result
+			WHEN MinusOp		SUBTRACT Num2 FROM Num1 GIVING Result
+			WHEN EndChar		PERFORM ExitParagraph
+			WHEN OTHER		PERFORM ExitParagraph
+		END-EVALUATE
+		DISPLAY "Result is ", Result
+	END-PERFORM.
+
+ExitParagraph.
+	STOP RUN.
